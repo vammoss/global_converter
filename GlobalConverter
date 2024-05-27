@@ -1,0 +1,166 @@
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        if (args.length != 2) {
+            System.out.println("Utilisation: java Name <base> <input>");
+            System.out.println("Bases disponibles: hexadecimal, octal, decimal, binary, text");
+            System.out.println("Abréviations: -h, -o, -d, -b, -t");
+            return;
+        }
+
+        String base = args[0].toLowerCase();
+    	String input = args[1];
+        
+        // Validation de la base
+        if (!Validator.isValidBase(base)) {
+            System.out.println("Base invalide. Veuillez utiliser hexadecimal, octal, decimal, binary, text ou leurs abréviations -h, -o, -d, -b, -t.");
+            return;
+        }
+
+        base = Validator.expandBase(base);
+        
+        // Validation de l'entrée
+        if (!Validator.isValidInput(input)) {
+            System.out.println("Chaîne de caractères invalide. Veuillez saisir une chaîne alphabétique et/ou numérique.");
+            return;
+        }
+
+
+        // Conversion de la chaîne de caractères
+        String translatedString = Translator.translate(input, base);
+        System.out.println(translatedString.toUpperCase());
+    }
+}
+
+class Validator {
+    public static boolean isValidInput(String input) {
+        return input.matches("[a-zA-Z0-9 ]+");
+    }
+
+    public static boolean isValidBase(String base) {
+        switch (base) {
+            case "hexadecimal":
+            case "octal":
+            case "decimal":
+            case "binary":
+            case "text":
+            case "-h":
+            case "-o":
+            case "-d":
+            case "-b":
+            case "-t":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static String expandBase(String base) {
+        switch (base) {
+            case "-h":
+                return "hexadecimal";
+            case "-o":
+                return "octal";
+            case "-d":
+                return "decimal";
+            case "-b":
+                return "binary";
+            case "-t":
+                return "text";
+            default:
+                return base;
+        }
+    }
+}
+
+class Translator {
+    public static String translate(String input, String base) {
+        StringBuilder result = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            switch (base) {
+                case "hexadecimal":
+                    result.append(toHexadecimal(c)).append(" ");
+                    break;
+                case "octal":
+                    result.append(toOctal(c)).append(" ");
+                    break;
+                case "decimal":
+                    result.append(toDecimal(c)).append(" ");
+                    break;
+                case "binary":
+                    result.append(toBinary(c)).append(" ");
+                    break;
+                case "text":
+                    result.append(toText(c)).append(" ");
+                    break;
+            }
+        }
+        return result.toString().trim();
+    }
+
+    // Conversion vers Hexadécimal
+    private static String toHexadecimal(char c) {
+        return toBase(c, 16);
+    }
+
+    private static char fromHexadecimal(String hex) {
+        return (char) fromBase(hex, 16);
+    }
+
+    // Conversion vers Octal
+    private static String toOctal(char c) {
+        return toBase(c, 8);
+    }
+
+    private static char fromOctal(String octal) {
+        return (char) fromBase(octal, 8);
+    }
+
+    // Conversion vers Décimal
+    private static String toDecimal(char c) {
+        return Integer.toString(c);
+    }
+
+    private static char fromDecimal(String decimal) {
+        return (char) Integer.parseInt(decimal);
+    }
+
+    // Conversion vers Binaire
+    private static String toBinary(char c) {
+        return toBase(c, 2);
+    }
+
+    private static char fromBinary(String binary) {
+        return (char) fromBase(binary, 2);
+    }
+
+    // Conversion vers Texte
+    private static String toText(char c) {
+        return Character.toString(c);
+    }
+
+    private static char fromText(String text) {
+        return text.charAt(0);
+    }
+
+    // Fonction de conversion vers n'importe quelle base
+    private static String toBase(int number, int base) {
+        StringBuilder result = new StringBuilder();
+        while (number > 0) {
+            int remainder = number % base;
+            result.append(Character.forDigit(remainder, base));
+            number /= base;
+        }
+        return result.reverse().toString();
+    }
+
+    // Fonction de conversion depuis n'importe quelle base
+    private static int fromBase(String value, int base) {
+        int result = 0;
+        for (int i = 0; i < value.length(); i++) {
+            result = result * base + Character.digit(value.charAt(i), base);
+        }
+        return result;
+    }
+}
